@@ -1,0 +1,16 @@
+{
+         "name": "專案網站",
+         "short_name": "專案",
+         "description": "轉址到我的 Google Sites 專案網站",
+         "start_url": "/114E01/",
+         "display": "standalone",
+         "background_color": "#f0f0f0",
+         "theme_color": "#007bff",
+         "icons": [
+             {
+                 "src": "/114E01/favicon.png",
+                 "sizes": "512x512",
+                 "type": "image/png"
+             }
+         ]
+     }

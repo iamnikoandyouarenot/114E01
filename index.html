@@ -1,14 +1,54 @@
-<!DOCTYPE html>
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="我的網站">
-    <meta name="description" content="轉址到我的 Google Sites 網站">
-    <link rel="apple-touch-icon" href="https://via.placeholder.com/512x512.png?text=Logo">
-    <title>我的網站</title>
+    <meta name="apple-mobile-web-app-title" content="專案網站">
+    <meta name="description" content="轉址到我的 Google Sites 專案網站">
+    <link rel="apple-touch-icon" href="/114E01/favicon.png">
+    <link rel="manifest" href="/114E01/manifest.json">
+    <title>專案網站</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -63,8 +103,8 @@
     </script>
 </head>
 <body>
-    <h1>歡迎訪問我的網站</h1>
-    <p>點擊下方按鈕前往我的 Google Sites 網站，或在瀏覽器中點擊「分享」圖示並選擇「加入主畫面」以將此網站保存到您的 iPhone 主畫面。</p>
+    <h1>歡迎訪問我的專案網站</h1>
+    <p>點擊下方按鈕前往專案網站，或在 Safari 中點擊「分享」圖示並選擇「加入主畫面」以將此網站保存到您的 iPhone 主畫面。</p>
     <button onclick="redirectToChrome()">前往網站</button>
 </body>
 </html>
